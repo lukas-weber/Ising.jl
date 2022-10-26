@@ -1,0 +1,34 @@
+#!/usr/bin/env python3
+
+from loadleveller import taskmaker
+import numpy as np
+
+# create a job named './job' with the jobconfig 'jobconfig.yml' (path relative to jobfile)
+tm = taskmaker.TaskMaker(__file__, 'jobconfig.yml')
+
+# builtin loadleveller parameters
+tm.sweeps = 100000
+tm.thermalization = 10000
+tm.binsize = 1
+
+# parameters for the ising simulation
+Lxs = [10, 20, 30]
+Ts = np.linspace(1,4,20)
+
+# parameters need not be numbers
+tm.test = [1,2,3,4]
+
+for Lx in Lxs:
+    for T in Ts:
+        # every call to task() will turn into one task which has
+        # the current state of the parameter set.
+        # You could also write
+        #
+        # tm.Lx = Lx
+        # tm.T = T
+        # tm.task()
+        
+        tm.task(Lx=Lx, T=T)
+
+# this will write out the actual jobfile. Do not forget this line.
+tm.write()
