@@ -7,13 +7,13 @@ import numpy as np
 tm = taskmaker.TaskMaker(__file__, 'jobconfig.yml')
 
 # builtin loadleveller parameters
-tm.sweeps = 100000
+tm.sweeps = 10000
 tm.thermalization = 10000
 tm.binsize = 1
 
 # parameters for the ising simulation
-Lxs = [10, 20, 30]
-Ts = np.linspace(1,4,20)
+Lxs = [10, 20]
+Ts = np.linspace(1,4,10)
 
 # parameters need not be numbers
 tm.test = [1,2,3,4]
