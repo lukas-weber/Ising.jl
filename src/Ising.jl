@@ -17,7 +17,7 @@ function MC(params::Dict)
     return MC(T, zeros(Lx, Ly))
 end
 
-function LoadLeveller.init!(mc::MC, ctx::LoadLeveller.MCContext, params::Dict)
+function LoadLeveller.init!(mc::MC, ctx::LoadLeveller.MCContext, params::AbstractDict)
     mc.spins = rand(ctx.rng, Bool, size(mc.spins)) * 2 .- 1
     return nothing
 end
@@ -104,7 +104,7 @@ function LoadLeveller.register_evaluables(
     return nothing
 end
 
-function LoadLeveller.write_checkpoint!(mc::MC, out::HDF5.Group)
+function LoadLeveller.write_checkpoint(mc::MC, out::HDF5.Group)
     out["spins"] = mc.spins
     return nothing
 end
