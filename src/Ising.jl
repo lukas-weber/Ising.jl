@@ -11,9 +11,9 @@ mutable struct MC <: LoadLeveller.AbstractMC
 end
 
 function MC(params::Dict)
-    Lx = params["Lx"]
-    Ly = get(params, "Ly", Lx)
-    T = params["T"]
+    Lx = params[:Lx]
+    Ly = get(params, :Ly, Lx)
+    T = params[:T]
     return MC(T, zeros(Lx, Ly))
 end
 
@@ -79,9 +79,9 @@ function LoadLeveller.register_evaluables(
     eval::LoadLeveller.Evaluator,
     params::Dict,
 )
-    T = params["T"]
-    Lx = params["Lx"]
-    Ly = get(params, "Ly", Lx)
+    T = params[:T]
+    Lx = params[:Lx]
+    Ly = get(params, :Ly, Lx)
 
     evaluate!(eval, :BinderRatio, [:Magnetization2, :Magnetization4]) do mag2, mag4
         return mag2 * mag2 / mag4
