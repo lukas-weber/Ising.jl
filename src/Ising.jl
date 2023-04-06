@@ -44,7 +44,7 @@ function LoadLeveller.sweep!(mc::MC, ctx::LoadLeveller.MCContext)
         )
 
         if ratio >= 1 || ratio > rand(ctx.rng)
-            mc.spins[1] *= -1
+            mc.spins[x, y] *= -1
         end
     end
     return nothing
