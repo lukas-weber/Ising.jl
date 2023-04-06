@@ -1,6 +1,6 @@
 name = "Ising"
 uuid = "a4b17d44-13d4-4c91-98cd-0449bec393fd"
-authors = ["lukas "]
+authors = ["Lukas Weber"]
 version = "0.1.0"
 
 [deps]
