@@ -10,7 +10,7 @@ mutable struct MC <: LoadLeveller.AbstractMC
     spins::Array{Int32,2}
 end
 
-function MC(params::Dict)
+function MC(params::AbstractDict)
     Lx = params[:Lx]
     Ly = get(params, :Ly, Lx)
     T = params[:T]
@@ -77,21 +77,21 @@ end
 function LoadLeveller.register_evaluables(
     ::Type{Ising.MC},
     eval::LoadLeveller.Evaluator,
-    params::Dict,
+    params::AbstractDict,
 )
     T = params[:T]
     Lx = params[:Lx]
     Ly = get(params, :Ly, Lx)
 
-    evaluate!(eval, :BinderRatio, [:Magnetization2, :Magnetization4]) do mag2, mag4
+    evaluate!(eval, :BinderRatio, (:Magnetization2, :Magnetization4)) do mag2, mag4
         return mag2 * mag2 / mag4
     end
 
-    evaluate!(eval, :Susceptibility, [:Magnetization2]) do mag2
+    evaluate!(eval, :Susceptibility, (:Magnetization2,)) do mag2
         return Lx * Ly * mag2 / T
     end
 
-    evaluate!(eval, :SpinCorrelationK, [:SpinCorrelation]) do corr
+    evaluate!(eval, :SpinCorrelationK, (:SpinCorrelation,)) do corr
         corrk = zero(corr)
         for i = 1:length(corr)
             for j = 1:length(corr)
