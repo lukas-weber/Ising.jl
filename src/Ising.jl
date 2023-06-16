@@ -2,9 +2,8 @@ module Ising
 
 using LoadLeveller
 using HDF5
-using Random
 
-mutable struct MC <: LoadLeveller.AbstractMC
+mutable struct MC <: AbstractMC
     T::Float64
 
     spins::Array{Int32,2}
@@ -17,21 +16,20 @@ function MC(params::AbstractDict)
     return MC(T, zeros(Lx, Ly))
 end
 
-function LoadLeveller.init!(mc::MC, ctx::LoadLeveller.MCContext, params::AbstractDict)
+function LoadLeveller.init!(mc::MC, ctx::MCContext, params::AbstractDict)
     mc.spins = rand(ctx.rng, Bool, size(mc.spins)) * 2 .- 1
     return nothing
 end
 
 function periodic_elem(spins::AbstractArray, x::Integer, y::Integer)
-    return spins[1+mod(x - 1, size(spins, 1)), 1+mod(y - 1, size(spins, 2))]
+    return spins[mod1.((x, y), size(spins))...]
 end
 
-function LoadLeveller.sweep!(mc::MC, ctx::LoadLeveller.MCContext)
+function LoadLeveller.sweep!(mc::MC, ctx::MCContext)
     Lx = size(mc.spins, 1)
-    Ly = size(mc.spins, 2)
 
 
-    for n = 1:length(mc.spins)
+    for _ = 1:length(mc.spins)
         i = floor(Int32, rand(ctx.rng) * length(mc.spins))
         x = 1 + i % Lx
         y = 1 + i ÷ Lx
@@ -50,7 +48,7 @@ function LoadLeveller.sweep!(mc::MC, ctx::LoadLeveller.MCContext)
     return nothing
 end
 
-function LoadLeveller.measure!(mc::MC, ctx::LoadLeveller.MCContext)
+function LoadLeveller.measure!(mc::MC, ctx::MCContext)
     mag = sum(mc.spins) / length(mc.spins)
 
     energy = 0.0
@@ -60,23 +58,26 @@ function LoadLeveller.measure!(mc::MC, ctx::LoadLeveller.MCContext)
         for x = 1:size(mc.spins, 1)
             neighbor = (dx, dy) -> periodic_elem(mc.spins, x + dx, y + dy)
             energy += -mc.spins[x, y] * (neighbor(1, 0) + neighbor(0, 1))
+
             # smart people use more lattice symmetries!
             correlation[x] += mc.spins[1, y] * mc.spins[x, y]
         end
     end
 
-    LoadLeveller.measure!(ctx, :Magnetization, mag)
-    LoadLeveller.measure!(ctx, :AbsMagnetization, abs(mag))
-    LoadLeveller.measure!(ctx, :Magnetization2, mag^2)
-    LoadLeveller.measure!(ctx, :Magnetization4, mag^4)
+    measure!(ctx, :Energy, energy / length(mc.spins))
 
-    LoadLeveller.measure!(ctx, :SpinCorrelation, correlation ./ size(mc.spins, 2))
+    measure!(ctx, :Magnetization, mag)
+    measure!(ctx, :AbsMagnetization, abs(mag))
+    measure!(ctx, :Magnetization2, mag^2)
+    measure!(ctx, :Magnetization4, mag^4)
+
+    measure!(ctx, :SpinCorrelation, correlation ./ size(mc.spins, 2))
     return nothing
 end
 
 function LoadLeveller.register_evaluables(
     ::Type{Ising.MC},
-    eval::LoadLeveller.Evaluator,
+    eval::Evaluator,
     params::AbstractDict,
 )
     T = params[:T]
