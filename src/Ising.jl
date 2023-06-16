@@ -28,9 +28,8 @@ end
 function LoadLeveller.sweep!(mc::MC, ctx::MCContext)
     Lx = size(mc.spins, 1)
 
-
     for _ = 1:length(mc.spins)
-        i = floor(Int32, rand(ctx.rng) * length(mc.spins))
+        i = rand(ctx.rng, 0:length(mc.spins)-1)
         x = 1 + i % Lx
         y = 1 + i ÷ Lx
 
@@ -94,10 +93,8 @@ function LoadLeveller.register_evaluables(
 
     evaluate!(eval, :SpinCorrelationK, (:SpinCorrelation,)) do corr
         corrk = zero(corr)
-        for i = 1:length(corr)
-            for j = 1:length(corr)
-                corrk[i] += corr[j] * cos(2 * pi / length(corr) * (i - 1) * (j - 1))
-            end
+        for i = 1:length(corr), j = 1:length(corr)
+            corrk[i] += corr[j] * cos(2π / length(corr) * (i - 1) * (j - 1))
         end
         return corrk
     end
@@ -114,7 +111,6 @@ function LoadLeveller.read_checkpoint!(mc::MC, in::HDF5.Group)
     mc.spins = read(in, "spins")
     return nothing
 end
-
 
 
 end # module Ising
