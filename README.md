@@ -1,16 +1,16 @@
 # Ising
 
-This is the reference implementation of the Metropolis Markov-Chain Monte Carlo algorithm for the 2D Ising model using the [LoadLeveller](https://github.com/lukas-weber/LoadLeveller.jl) framework. 
+This is the reference implementation of the Metropolis Markov-Chain Monte Carlo algorithm for the 2D Ising model using the [Carlo](https://github.com/lukas-weber/Carlo.jl) framework. 
 
-The file `src/Ising.jl` contains the implementation of the `LoadLeveller.AbstractMC` interface, which is all that is needed to implement a LoadLeveller Monte Carlo algorithm.
+The file `src/Ising.jl` contains the implementation of the `Carlo.AbstractMC` interface, which is all that is needed to implement a Carlo Monte Carlo algorithm.
 
 ## Installation
 ```julia
-julia> using Pkg; Pkg.add("Ising"); Pkg.add("LoadLeveller")
+julia> using Pkg; Pkg.add("Ising"); Pkg.add("Carlo")
 ```
 
 ## Example
-There is an example job script `example/job` to show how to run simulations using LoadLeveller. Simply execute it to access the LoadLeveller command-line interface.
+There is an example job script `example/job` to show how to run simulations using Carlo. Simply execute it to access the Carlo command-line interface.
 
 ```bash
 cd example

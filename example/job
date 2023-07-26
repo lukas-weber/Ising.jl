@@ -1,7 +1,7 @@
 #!/usr/bin/env julia
 
-using LoadLeveller
-using LoadLeveller.JobTools
+using Carlo
+using Carlo.JobTools
 using Ising
 
 tm = TaskMaker()
@@ -37,4 +37,4 @@ job = JobInfo(
     run_time = "24:00:00"
 )
 
-LoadLeveller.start(job, ARGS)
+Carlo.start(job, ARGS)

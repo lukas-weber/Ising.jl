@@ -1,4 +1,4 @@
-using LoadLeveller.ResultTools
+using Carlo.ResultTools
 using Measurements
 using StaticArrays
 using DataFrames
@@ -79,7 +79,7 @@ end
             tasks = tasks,
         )
 
-        start(LoadLeveller.SingleRunner{job.mc}, job)
+        start(Carlo.SingleScheduler, job)
 
         return DataFrame(ResultTools.dataframe(dirname * "/test.results.json"))
     end

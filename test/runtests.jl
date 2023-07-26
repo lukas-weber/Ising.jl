@@ -1,7 +1,7 @@
 using Test
 
 using Ising
-using LoadLeveller
-using LoadLeveller.JobTools
+using Carlo
+using Carlo.JobTools
 
 include("test_sum.jl")

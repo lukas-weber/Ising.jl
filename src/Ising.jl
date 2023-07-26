@@ -1,6 +1,6 @@
 module Ising
 
-using LoadLeveller
+using Carlo
 using HDF5
 
 mutable struct MC <: AbstractMC
@@ -16,7 +16,7 @@ function MC(params::AbstractDict)
     return MC(T, zeros(Lx, Ly))
 end
 
-function LoadLeveller.init!(mc::MC, ctx::MCContext, params::AbstractDict)
+function Carlo.init!(mc::MC, ctx::MCContext, params::AbstractDict)
     mc.spins = rand(ctx.rng, Bool, size(mc.spins)) * 2 .- 1
     return nothing
 end
@@ -25,7 +25,7 @@ function periodic_elem(spins::AbstractArray, x::Integer, y::Integer)
     return spins[mod1.((x, y), size(spins))...]
 end
 
-function LoadLeveller.sweep!(mc::MC, ctx::MCContext)
+function Carlo.sweep!(mc::MC, ctx::MCContext)
     Lx = size(mc.spins, 1)
 
     for _ = 1:length(mc.spins)
@@ -47,7 +47,7 @@ function LoadLeveller.sweep!(mc::MC, ctx::MCContext)
     return nothing
 end
 
-function LoadLeveller.measure!(mc::MC, ctx::MCContext)
+function Carlo.measure!(mc::MC, ctx::MCContext)
     mag = sum(mc.spins) / length(mc.spins)
 
     energy = 0.0
@@ -74,11 +74,7 @@ function LoadLeveller.measure!(mc::MC, ctx::MCContext)
     return nothing
 end
 
-function LoadLeveller.register_evaluables(
-    ::Type{Ising.MC},
-    eval::Evaluator,
-    params::AbstractDict,
-)
+function Carlo.register_evaluables(::Type{Ising.MC}, eval::Evaluator, params::AbstractDict)
     T = params[:T]
     Lx = params[:Lx]
     Ly = get(params, :Ly, Lx)
@@ -102,12 +98,12 @@ function LoadLeveller.register_evaluables(
     return nothing
 end
 
-function LoadLeveller.write_checkpoint(mc::MC, out::HDF5.Group)
+function Carlo.write_checkpoint(mc::MC, out::HDF5.Group)
     out["spins"] = mc.spins
     return nothing
 end
 
-function LoadLeveller.read_checkpoint!(mc::MC, in::HDF5.Group)
+function Carlo.read_checkpoint!(mc::MC, in::HDF5.Group)
     mc.spins = read(in, "spins")
     return nothing
 end
