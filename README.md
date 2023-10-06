@@ -14,9 +14,24 @@ There is an example job script `example/job` to show how to run simulations usin
 
 ```bash
 cd example
-./job --help
 
 ./job run
 ```
 
 If everything went well, you should find the file `example/job.results.json` containing the means and errorbars of your calculation.
+
+For unfinished jobs, you can at any point use
+
+```bash
+./job status
+```
+
+to retrieve progress information and 
+
+```bash
+./job merge
+```
+
+to merge the data already collected into a results file.
+
+To start over from scratch, remember to `./job delete` the existing data or use the `run -r` flag. For more information, run `./job --help`.
