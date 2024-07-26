@@ -1,4 +1,6 @@
 # Ising
+[![DOI](https://zenodo.org/badge/558064408.svg)](https://zenodo.org/doi/10.5281/zenodo.12981007)
+
 
 This is the reference implementation of the Metropolis Markov-Chain Monte Carlo algorithm for the 2D Ising model using the [Carlo.jl](https://github.com/lukas-weber/Carlo.jl) framework.
 
