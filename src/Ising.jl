@@ -3,10 +3,10 @@ module Ising
 using Carlo
 using HDF5
 
-mutable struct MC <: AbstractMC
+struct MC <: AbstractMC
     T::Float64
 
-    spins::Array{Int32,2}
+    spins::Matrix{Int8}
 end
 
 function MC(params::AbstractDict)
@@ -17,7 +17,7 @@ function MC(params::AbstractDict)
 end
 
 function Carlo.init!(mc::MC, ctx::MCContext, params::AbstractDict)
-    mc.spins = rand(ctx.rng, Bool, size(mc.spins)) * 2 .- 1
+    mc.spins .= rand(ctx.rng, Bool, size(mc.spins)) .* 2 .- 1
     return nothing
 end
 
@@ -29,11 +29,10 @@ function Carlo.sweep!(mc::MC, ctx::MCContext)
     Lx = size(mc.spins, 1)
 
     for _ = 1:length(mc.spins)
-        i = rand(ctx.rng, 0:length(mc.spins)-1)
-        x = 1 + i % Lx
-        y = 1 + i ÷ Lx
+        i = rand(ctx.rng, eachindex(mc.spins))
+        x, y = fldmod1(i, size(mc.spins, 1))
 
-        neighbor = (dx, dy) -> periodic_elem(mc.spins, x + dx, y + dy)
+        neighbor(dx, dy) = periodic_elem(mc.spins, x + dx, y + dy)
         ratio = exp(
             -2.0 / mc.T *
             mc.spins[x, y] *
@@ -55,10 +54,10 @@ function Carlo.measure!(mc::MC, ctx::MCContext)
     correlation = zeros(size(mc.spins, 1))
     for y = 1:size(mc.spins, 2)
         for x = 1:size(mc.spins, 1)
-            neighbor = (dx, dy) -> periodic_elem(mc.spins, x + dx, y + dy)
+            neighbor(dx, dy) = periodic_elem(mc.spins, x + dx, y + dy)
             energy += -mc.spins[x, y] * (neighbor(1, 0) + neighbor(0, 1))
 
-            # smart people use more lattice symmetries!
+            # in practice, one should use more lattice symmetries!
             correlation[x] += mc.spins[1, y] * mc.spins[x, y]
         end
     end
@@ -74,7 +73,7 @@ function Carlo.measure!(mc::MC, ctx::MCContext)
     return nothing
 end
 
-function Carlo.register_evaluables(::Type{Ising.MC}, eval::Evaluator, params::AbstractDict)
+function Carlo.register_evaluables(::Type{MC}, eval::Evaluator, params::AbstractDict)
     T = params[:T]
     Lx = params[:Lx]
     Ly = get(params, :Ly, Lx)
@@ -104,7 +103,7 @@ function Carlo.write_checkpoint(mc::MC, out::HDF5.Group)
 end
 
 function Carlo.read_checkpoint!(mc::MC, in::HDF5.Group)
-    mc.spins = read(in, "spins")
+    mc.spins .= read(in, "spins")
     return nothing
 end
 
