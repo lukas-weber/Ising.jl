@@ -3,7 +3,7 @@ module Ising
 using Carlo
 using HDF5
 
-struct MC <: AbstractMC
+mutable struct MC <: AbstractMC
     T::Float64
 
     spins::Matrix{Int8}
@@ -73,7 +73,11 @@ function Carlo.measure!(mc::MC, ctx::MCContext)
     return nothing
 end
 
-function Carlo.register_evaluables(::Type{MC}, eval::Evaluator, params::AbstractDict)
+function Carlo.register_evaluables(
+    ::Type{MC},
+    eval::AbstractEvaluator,
+    params::AbstractDict,
+)
     T = params[:T]
     Lx = params[:Lx]
     Ly = get(params, :Ly, Lx)
@@ -107,5 +111,28 @@ function Carlo.read_checkpoint!(mc::MC, in::HDF5.Group)
     return nothing
 end
 
+function Carlo.parallel_tempering_log_weight_ratio(mc::MC, parameter::Symbol, new_value)
+    if parameter != :T
+        error("parallel tempering not implemented for $parameter")
+    end
+
+    energy = 0.0
+    for y = 1:size(mc.spins, 2)
+        for x = 1:size(mc.spins, 1)
+            neighbor(dx, dy) = periodic_elem(mc.spins, x + dx, y + dy)
+            energy += -mc.spins[x, y] * (neighbor(1, 0) + neighbor(0, 1))
+        end
+    end
+
+    return -(1 / new_value - 1 / mc.T) * energy
+end
+
+function Carlo.parallel_tempering_change_parameter!(mc::MC, parameter::Symbol, new_value)
+    if parameter != :T
+        error("parallel tempering not implemented for $parameter")
+    end
+
+    mc.T = new_value
+end
 
 end # module Ising
