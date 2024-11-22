@@ -63,6 +63,7 @@ function Carlo.measure!(mc::MC, ctx::MCContext)
     end
 
     measure!(ctx, :Energy, energy / length(mc.spins))
+    measure!(ctx, :Energy2, (energy / length(mc.spins))^2)
 
     measure!(ctx, :Magnetization, mag)
     measure!(ctx, :AbsMagnetization, abs(mag))
@@ -88,6 +89,10 @@ function Carlo.register_evaluables(
 
     evaluate!(eval, :Susceptibility, (:Magnetization2,)) do mag2
         return Lx * Ly * mag2 / T
+    end
+
+    evaluate!(eval, :SpecificHeat, (:Energy2, :Energy)) do energy2, energy
+        return Lx * Ly * (energy2 - energy^2) / T^2
     end
 
     evaluate!(eval, :SpinCorrelationK, (:SpinCorrelation,)) do corr
