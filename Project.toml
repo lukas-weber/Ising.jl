@@ -1,6 +1,6 @@
 name = "Ising"
 uuid = "a4b17d44-13d4-4c91-98cd-0449bec393fd"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Lukas Weber"]
 
 [deps]
