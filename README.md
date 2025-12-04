@@ -8,7 +8,7 @@ The file `src/Ising.jl` contains the implementation of the `Carlo.AbstractMC` in
 
 ## Installation
 ```julia
-julia> using Pkg; Pkg.add("Ising"); Pkg.add("Carlo")
+julia> using Pkg; Pkg.add(url="https://github.com/lukas-weber/Ising.jl"); Pkg.add("Carlo")
 ```
 
 ## Example
